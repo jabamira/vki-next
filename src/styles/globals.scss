@@ -3,6 +3,7 @@
 :root {  
   --color: #272727;
   --color2: #FFF;
+  --color3: #f00;
   --background: #FFF;
   --background2: #E1E1E1;
   --background3: #434343;  
@@ -10,11 +11,12 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    // --color: #d8d8d8;
-    // --color2: #000;
-    // --background: #000;
-    // --background2: #1E1E1E;
-    // --background3: #BABABA;
+     --color: #434040 ;//тексты
+     --color2: #434040;
+      --color3: #434040;
+     --background: #469597;
+     --background2: #BBC6C8;
+     --background3: #BBC6C8;
   }
 }
 

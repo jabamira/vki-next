@@ -1,0 +1,3 @@
+// src/http/get-students.http
+GET http://localhost:3000/api/students
+Content-Type: application/json

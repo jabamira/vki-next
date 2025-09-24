@@ -3,21 +3,26 @@ import { useQuery } from '@tanstack/react-query';
 import { getStudentsApi } from '@/api/studentApi';
 import StudentInterface from '@/types/StudentInterface';
 
-interface StudentHookInterface {
+// Опционально: создайте интерфейс, если хотите типизировать
+export interface StudentHookInterface {
   students: StudentInterface[];
+  isLoading: boolean;
+  isError: boolean;
+  error: unknown;
 }
 
 const useStudents = (): StudentHookInterface => {
-  // const queryClient = useQueryClient();
-
-  const { data } = useQuery({
+  const { data, isLoading, isError, error } = useQuery({
     queryKey: ['students'],
-    queryFn: () => getStudentsApi(),
-    enabled: false,
+    queryFn: getStudentsApi,
+    staleTime: 60 * 1000,
   });
 
   return {
-    students: data ?? [],
+    students: data || [],
+    isLoading,
+    isError,
+    error,
   };
 };
 
