@@ -11,18 +11,23 @@ import Main from '@/components/layout/Main/Main';
 import type { Metadata } from 'next';
 
 import '@/styles/globals.scss';
+<<<<<<< HEAD
 import StudentInterface from '@/types/StudentInterface';
 import { getStudentsApi } from '@/api/studentApi';
+=======
+import { META_DESCRIPTION, META_TITLE } from '@/constants/meta';
+import type StudentInterface from '@/types/StudentInterface';
+import { getStudentsApi } from '@/api/studentsApi';
+>>>>>>> 32326f3665f87d153f5724e9b61a5c05c281b8e4
 
 export const metadata: Metadata = {
-  title: 'Вэб разработка ВКИ - Next.js шаблон',
-  description: 'Шаблон для веб-разработки с использованием Next.js, React Hook Form, Yup, SCSS, Eslint, TanStack Query (React Query)',
+  title: META_TITLE,
+  description: META_DESCRIPTION,
 };
 
 const RootLayout = async ({ children }: Readonly<{ children: React.ReactNode }>): Promise<React.ReactElement> => {
-  let groups: GroupInterface[];
-
   // выполняется на сервере - загрузка групп
+  let groups: GroupInterface[];
   await queryClient.prefetchQuery({
     queryKey: ['groups'],
     queryFn: async () => {
@@ -34,6 +39,17 @@ const RootLayout = async ({ children }: Readonly<{ children: React.ReactNode }>)
     let students: StudentInterface[];
 
 
+  await queryClient.prefetchQuery({
+    queryKey: ['students'],
+    queryFn: async () => {
+      students = await getStudentsApi();
+      console.log('Students', students);
+      return students;
+    },
+  });
+
+  // выполняется на сервере - загрузка студентов
+  let students: StudentInterface[];
   await queryClient.prefetchQuery({
     queryKey: ['students'],
     queryFn: async () => {

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 "use client";
 
 import { useState, useEffect } from "react";
@@ -25,8 +26,39 @@ export default function Students() {
           key={student.id}
           student={student}
           onDelete={handleDelete}
+=======
+'use client';
+
+import useStudents from '@/hooks/useStudents';
+import type StudentInterface from '@/types/StudentInterface';
+import styles from './Students.module.scss';
+import Student from './Student/Student';
+
+const Students = (): React.ReactElement => {
+  const { students, deleteStudentMutate } = useStudents();
+
+  const onDeleteHandler = (studentId: number): void => {
+    if (confirm('Удалить студента?')) {
+      deleteStudentMutate(studentId);
+    }
+  };
+
+  return (
+    <div className={styles.Students}>
+      {students.map((student: StudentInterface) => (
+        <Student
+          key={student.id}
+          student={student}
+          onDelete={onDeleteHandler}
+>>>>>>> 32326f3665f87d153f5724e9b61a5c05c281b8e4
         />
       ))}
     </div>
   );
+<<<<<<< HEAD
 }
+=======
+};
+
+export default Students;
+>>>>>>> 32326f3665f87d153f5724e9b61a5c05c281b8e4
