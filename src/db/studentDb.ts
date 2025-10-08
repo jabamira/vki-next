@@ -1,45 +1,4 @@
 import sqlite3 from 'sqlite3';
-<<<<<<< HEAD
-import StudentInterface from '@/types/StudentInterface';
-
-sqlite3.verbose();
-
-
-export const getStudentsDb = async (): Promise<StudentInterface[]> => {
-  const db = new sqlite3.Database(process.env.DB ?? './db/vki-web.db');
-
-  return new Promise((resolve, reject) => {
-    const sql = 'SELECT * FROM student';
-    db.all(sql, [], (err, rows) => {
-      db.close();
-      if (err) {
-        reject(err);
-      } else {
-        resolve(rows as StudentInterface[]);
-      }
-    });
-  });
-};
-
-export const deleteStudentDb = async (id: number): Promise<void> => {
-  const db = new sqlite3.Database(process.env.DB ?? './db/vki-web.db');
-
-  return new Promise((resolve, reject) => {
-    const sql = 'DELETE FROM student WHERE id = ?';
-    db.run(sql, [id], function (err) {
-      db.close();
-      if (err) {
-        reject(err);
-      } else if (this.changes === 0) {
-    
-        reject(new Error('Student not found'));
-      } else {
-        resolve();
-      }
-    });
-  });
-};
-=======
 
 import type StudentInterface from '@/types/StudentInterface';
 import getRandomFio from '@/utils/getRandomFio';
@@ -124,4 +83,3 @@ export const addRandomStudentsDb = async (amount: number = 10): Promise<FioInter
 
   return fios;
 };
->>>>>>> 32326f3665f87d153f5724e9b61a5c05c281b8e4
