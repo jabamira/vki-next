@@ -1,43 +1,26 @@
-'use client';
+"use client";
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import useStudents from '@/hooks/useStudents';
-import Student from '@/components/Students/Student/Student';
-import StudentInterface from '@/types/StudentInterface';
-import styles from './Students.module.scss';
+import { useState, useEffect } from "react";
+import Student from "./Student/Student";
+import StudentInterface from "@/types/StudentInterface";
 
-const Students = (): React.ReactElement => {
-  const { students, isLoading, isError } = useStudents();
-  const queryClient = useQueryClient();
+export default function Students() {
+  const [students, setStudents] = useState<StudentInterface[]>([]);
 
-  // Мутация для удаления студента
-  const deleteStudentMutation = useMutation({
-    mutationFn: async (id: number) => {
-      const res = await fetch(`/api/students/${id}`, {
-        method: 'DELETE',
-      });
-      if (!res.ok) {
-        throw new Error('Failed to delete student');
-      }
-    },
-    onSuccess: () => {
-      // Инвалидируем кэш — React Query перезапросит студентов
-      queryClient.invalidateQueries({ queryKey: ['students'] });
-    },
-  });
+  useEffect(() => {
+    fetch("/api/students")
+      .then((res) => res.json())
+      .then((data) => setStudents(data));
+  }, []);
 
   const handleDelete = (id: number) => {
-    if (confirm('Вы уверены, что хотите удалить студента?')) {
-      deleteStudentMutation.mutate(id);
-    }
+    setStudents((prev) => prev.filter((s) => s.id !== id));
+     fetch(`/api/students/${id}`, { method: "DELETE" })
   };
 
-  if (isLoading) return <div>Загрузка...</div>;
-  if (isError) return <div>Ошибка при загрузке студентов</div>;
-
   return (
-    <div className={styles.Students}>
-      {students.map((student: StudentInterface) => (
+    <div>
+      {students.map((student) => (
         <Student
           key={student.id}
           student={student}
@@ -46,6 +29,4 @@ const Students = (): React.ReactElement => {
       ))}
     </div>
   );
-};
-
-export default Students;
+}

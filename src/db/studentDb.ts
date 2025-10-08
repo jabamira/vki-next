@@ -3,13 +3,9 @@ import StudentInterface from '@/types/StudentInterface';
 
 sqlite3.verbose();
 
-function openDb(): sqlite3.Database {
-  return new sqlite3.Database(process.env.DB ?? './db/vki-web.db');
-}
-
 
 export const getStudentsDb = async (): Promise<StudentInterface[]> => {
-  const db = openDb();
+  const db = new sqlite3.Database(process.env.DB ?? './db/vki-web.db');
 
   return new Promise((resolve, reject) => {
     const sql = 'SELECT * FROM student';
@@ -25,7 +21,7 @@ export const getStudentsDb = async (): Promise<StudentInterface[]> => {
 };
 
 export const deleteStudentDb = async (id: number): Promise<void> => {
-  const db = openDb();
+  const db = new sqlite3.Database(process.env.DB ?? './db/vki-web.db');
 
   return new Promise((resolve, reject) => {
     const sql = 'DELETE FROM student WHERE id = ?';
