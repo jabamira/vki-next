@@ -59,35 +59,42 @@ export const deleteStudentDb = async (studentId: number): Promise<number> => {
  */
 export const addRandomStudentsDb = async (
   amount: number = 10
-): Promise<FioInterface[]> => {
+): Promise<StudentInterface[]> => {
   const db = new sqlite3.Database(process.env.DB ?? "./db/vki-web.db");
 
-  const fios: FioInterface[] = [];
-  let fiosInsert: string = "";
+  const newStudents: StudentInterface[] = [];
+
   for (let i = 0; i < amount; i++) {
     const fio = getRandomFio();
-    fios.push(fio);
-    fiosInsert += `('${fio.firstName}', '${fio.lastName}', '${fio.middleName}', 1)`;
-    fiosInsert += `${i === amount - 1 ? ";" : ","}`;
+    const randomGroupId = Math.floor(Math.random() * 100) + 1;
+
+    // Вставка через prepared statement
+    const student: StudentInterface = await new Promise((resolve, reject) => {
+      db.run(
+        `INSERT INTO student (firstName, lastName, middleName, groupId) VALUES (?, ?, ?, ?)`,
+        [fio.firstName, fio.lastName, fio.middleName || "", randomGroupId],
+        function (err) {
+          if (err) {
+            reject(err);
+            db.close();
+            return;
+          }
+          resolve({
+            id: this.lastID,
+            firstName: fio.firstName,
+            lastName: fio.lastName,
+            middleName: fio.middleName || "",
+            groupId: randomGroupId,
+          });
+        }
+      );
+    });
+
+    newStudents.push(student);
   }
 
-  await new Promise((resolve, reject) => {
-    db.run(
-      `INSERT INTO student (firstName, lastName, middleName, groupId) VALUES ${fiosInsert}`,
-      [],
-      (err) => {
-        if (err) {
-          reject(err);
-          db.close();
-          return;
-        }
-        resolve(fios);
-        db.close();
-      }
-    );
-  });
-
-  return fios;
+  db.close();
+  return newStudents;
 };
 
 export const addStudentDb = async (
