@@ -8,3 +8,9 @@ CREATE TABLE student(
     groupId INTEGER,
     FOREIGN KEY (groupId) REFERENCES class(id)
 );
+CREATE TABLE class(
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    curator TEXT,
+    year INTEGER
+);

@@ -1,30 +1,30 @@
+import { deleteStudentDb } from "@/db/studentDb";
+import { NextRequest } from "next/server";
 
-import { deleteStudentDb } from '@/db/studentDb';
-import { NextRequest } from 'next/server';
+export async function DELETE(req: NextRequest): Promise<Response> {
+  // Получаем URL запроса
+  const url = new URL(req.url);
+  // Извлекаем id из pathname, предполагаем, что маршрут /api/students/[id]
+  const pathParts = url.pathname.split("/");
+  const idParam = pathParts[pathParts.length - 1];
 
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-): Promise<Response> {
-  const { id } = params;
+  const studentId = Number(idParam);
 
-
-  const studentId = Number(id);
   if (isNaN(studentId)) {
-    return new Response(JSON.stringify({ error: 'Invalid student ID' }), {
+    return new Response(JSON.stringify({ error: "Invalid student ID" }), {
       status: 400,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { "Content-Type": "application/json" },
     });
   }
 
   try {
     await deleteStudentDb(studentId);
-    return new Response(null, { status: 204 }); // 204 No Content — стандарт для успешного удаления
-  } catch (error) {
-    console.error('Failed to delete student:', error);
-    return new Response(JSON.stringify({ error: 'Failed to delete student' }), {
+    return new Response(null, { status: 204 });
+  } catch (err) {
+    console.error("Failed to delete student:", err);
+    return new Response(JSON.stringify({ error: "Failed to delete student" }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { "Content-Type": "application/json" },
     });
   }
 }
