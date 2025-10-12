@@ -1,8 +1,8 @@
-import sqlite3 from 'sqlite3';
+import sqlite3 from "sqlite3";
 
-import type StudentInterface from '@/types/StudentInterface';
-import getRandomFio from '@/utils/getRandomFio';
-import FioInterface from '@/types/FioInterface';
+import type StudentInterface from "@/types/StudentInterface";
+import getRandomFio from "@/utils/getRandomFio";
+import FioInterface from "@/types/FioInterface";
 
 sqlite3.verbose();
 
@@ -11,10 +11,10 @@ sqlite3.verbose();
  * @returns Promise<StudentInterface[]>
  */
 export const getStudentsDb = async (): Promise<StudentInterface[]> => {
-  const db = new sqlite3.Database(process.env.DB ?? './db/vki-web.db');
+  const db = new sqlite3.Database(process.env.DB ?? "./db/vki-web.db");
 
   const students = await new Promise((resolve, reject) => {
-    const sql = 'SELECT * FROM student';
+    const sql = "SELECT * FROM student";
     db.all(sql, [], (err, rows) => {
       if (err) {
         reject(err);
@@ -35,10 +35,10 @@ export const getStudentsDb = async (): Promise<StudentInterface[]> => {
  * @returns
  */
 export const deleteStudentDb = async (studentId: number): Promise<number> => {
-  const db = new sqlite3.Database(process.env.DB ?? './db/vki-web.db');
+  const db = new sqlite3.Database(process.env.DB ?? "./db/vki-web.db");
 
   await new Promise((resolve, reject) => {
-    db.run('DELETE FROM student WHERE id=?', [studentId], (err) => {
+    db.run("DELETE FROM student WHERE id=?", [studentId], (err) => {
       if (err) {
         reject(err);
         db.close();
@@ -57,29 +57,68 @@ export const deleteStudentDb = async (studentId: number): Promise<number> => {
  * @param mount количество добавляемых записей - 10 по умолчанию
  * @returns
  */
-export const addRandomStudentsDb = async (amount: number = 10): Promise<FioInterface[]> => {
-  const db = new sqlite3.Database(process.env.DB ?? './db/vki-web.db');
+export const addRandomStudentsDb = async (
+  amount: number = 10
+): Promise<FioInterface[]> => {
+  const db = new sqlite3.Database(process.env.DB ?? "./db/vki-web.db");
 
   const fios: FioInterface[] = [];
-  let fiosInsert: string = ''
+  let fiosInsert: string = "";
   for (let i = 0; i < amount; i++) {
     const fio = getRandomFio();
     fios.push(fio);
     fiosInsert += `('${fio.firstName}', '${fio.lastName}', '${fio.middleName}', 1)`;
-    fiosInsert += `${i === amount - 1 ? ';' : ','}`;
+    fiosInsert += `${i === amount - 1 ? ";" : ","}`;
   }
 
   await new Promise((resolve, reject) => {
-    db.run(`INSERT INTO student (firstName, lastName, middleName, groupId) VALUES ${fiosInsert}`, [], (err) => {
-      if (err) {
-        reject(err);
+    db.run(
+      `INSERT INTO student (firstName, lastName, middleName, groupId) VALUES ${fiosInsert}`,
+      [],
+      (err) => {
+        if (err) {
+          reject(err);
+          db.close();
+          return;
+        }
+        resolve(fios);
         db.close();
-        return;
       }
-      resolve(fios);
-      db.close();
-    });
+    );
   });
 
   return fios;
+};
+
+export const addStudentDb = async (
+  student: Omit<StudentInterface, "id">
+): Promise<StudentInterface> => {
+  const db = new sqlite3.Database(process.env.DB ?? "./db/vki-web.db");
+
+  const newStudent: StudentInterface = await new Promise((resolve, reject) => {
+    const sql = `INSERT INTO student (firstName, lastName, middleName, groupId) 
+                 VALUES (?, ?, ?, ?)`;
+
+    db.run(
+      sql,
+      [
+        student.firstName,
+        student.lastName,
+        student.middleName || "",
+        student.groupId,
+      ],
+      function (err) {
+        if (err) {
+          reject(err);
+          db.close();
+          return;
+        }
+        // this.lastID — id только что вставленной записи
+        resolve({ id: this.lastID, ...student });
+        db.close();
+      }
+    );
+  });
+
+  return newStudent;
 };
